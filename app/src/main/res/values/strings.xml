@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">ICS342App</string>
+    <string name="app_name">SkyCast</string>
+    <string name="weather_icon_desc">Weather icon showing sunny conditions</string>
+    <string name="current_temperature">72°F</string>
+    <string name="weather_condition">Clear Skies</string>
+    <string name="location">Minneapolis, MN</string>
 </resources>
