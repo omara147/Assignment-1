@@ -1,5 +1,8 @@
 package com.example.ics342app
 
+import android.Manifest
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -15,6 +19,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ics342app.ui.theme.ICS342AppTheme
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +57,7 @@ fun MainNavigation() {
 fun ZipEntryScreen(navController: NavHostController) {
     var zipCode by remember { mutableStateOf(TextFieldValue("")) }
     var isValid by remember { mutableStateOf(true) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -100,6 +107,49 @@ fun ZipEntryScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("See Current Weather")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    val fineLocation = Manifest.permission.ACCESS_FINE_LOCATION
+                    val coarseLocation = Manifest.permission.ACCESS_COARSE_LOCATION
+                    val postNotifications = Manifest.permission.POST_NOTIFICATIONS
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (ContextCompat.checkSelfPermission(context, postNotifications)
+                            != android.content.pm.PackageManager.PERMISSION_GRANTED
+                        ) {
+                            ActivityCompat.requestPermissions(
+                                context as ComponentActivity,
+                                arrayOf(postNotifications),
+                                1003
+                            )
+                        }
+                    }
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        val hasFine = context.checkSelfPermission(fineLocation) ==
+                                android.content.pm.PackageManager.PERMISSION_GRANTED
+                        val hasCoarse = context.checkSelfPermission(coarseLocation) ==
+                                android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                        if (hasFine && hasCoarse) {
+                            val intent = Intent(context, MyLocationService::class.java)
+                            ContextCompat.startForegroundService(context, intent)
+                        } else {
+                            ActivityCompat.requestPermissions(
+                                (context as ComponentActivity),
+                                arrayOf(fineLocation, coarseLocation),
+                                1001
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("📍 Use My Location")
             }
         }
     }
