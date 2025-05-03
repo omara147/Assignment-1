@@ -15,11 +15,9 @@ import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-class WeatherViewModel : ViewModel() {
+class WeatherViewModel(private val service: WeatherService = RetrofitInstance.api) : ViewModel() {
     private val _weather = MutableStateFlow<WeatherResponse?>(null)
     val weather: StateFlow<WeatherResponse?> = _weather.asStateFlow()
-
-    private val service = RetrofitInstance.api
 
     fun fetchWeather(city: String) {
         viewModelScope.launch {
@@ -33,7 +31,7 @@ class WeatherViewModel : ViewModel() {
     }
 
     companion object {
-        const val API_KEY = "3d4e715a4658b370c46c5dfb1b11ce7e" // Replace if needed
+        const val API_KEY = "3d4e715a4658b370c46c5dfb1b11ce7e"
     }
 }
 

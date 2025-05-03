@@ -17,16 +17,16 @@ import retrofit2.http.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ForecastViewModel : ViewModel() {
-
-    private val _forecast = MutableStateFlow<List<ForecastDay>>(emptyList())
-    val forecast: StateFlow<List<ForecastDay>> = _forecast.asStateFlow()
-
-    private val service = Retrofit.Builder()
+class ForecastViewModel(
+    private val service: ForecastApi = Retrofit.Builder()
         .baseUrl("https://pro.openweathermap.org/")
         .addConverterFactory(Json { ignoreUnknownKeys = true }.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(ForecastApi::class.java)
+) : ViewModel() {
+
+    private val _forecast = MutableStateFlow<List<ForecastDay>>(emptyList())
+    val forecast: StateFlow<List<ForecastDay>> = _forecast.asStateFlow()
 
     fun fetchForecast(zip: String) {
         viewModelScope.launch {
